@@ -1,4 +1,4 @@
-"""nfpm packager - rpm, deb, and (same tool) apk/archlinux."""
+"""nfpm packager"""
 
 import logging
 import os
@@ -26,7 +26,7 @@ def read_package_name() -> str:
 
 
 def build(fmt: str, version: str, release: str, arch: str, output_dir: Path, staged_bundle: Path) -> None:
-    # staged_bundle unused: nfpm.yaml's own paths already point at ./stage/bundle
+    
     if not NFPM_CONFIG.exists():
         raise SystemExit(f"{NFPM_CONFIG} not found")
     if shutil.which("nfpm") is None:

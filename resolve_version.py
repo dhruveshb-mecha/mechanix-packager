@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""Resolves the next Pulp release number for a package format.
-
-rpm/deb-specific (Pulp's content model), so this reads the nfpm packager's
-config directly rather than going through packagers.resolve().
+"""Resolves the next release number for a package.
 
 Usage:
     python3 /path/to/mechanix-packager/resolve_version.py --format rpm

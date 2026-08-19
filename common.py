@@ -14,12 +14,23 @@ STAGE_DIR = REPO_ROOT / "stage"
 
 def read_upstream_version() -> str:
     pubspec = REPO_ROOT / "pubspec.yaml"
-    if not pubspec.exists():
-        raise SystemExit(f"{pubspec} not found - run this from an app repo's root")
-    match = re.search(r"^version:\s*(\S+)", pubspec.read_text(), re.MULTILINE)
-    if not match:
-        raise SystemExit(f"No version field found in {pubspec}")
-    return match.group(1).split("+")[0]
+    if pubspec.exists():
+        match = re.search(r"^version:\s*(\S+)", pubspec.read_text(), re.MULTILINE)
+        if not match:
+            raise SystemExit(f"No version field found in {pubspec}")
+        return match.group(1).split("+")[0]
+
+    cargo_toml = REPO_ROOT / "Cargo.toml"
+    if cargo_toml.exists():
+        package_section = re.search(r"^\[package\](.*?)(?=^\[|\Z)", cargo_toml.read_text(), re.MULTILINE | re.DOTALL)
+        if not package_section:
+            raise SystemExit(f"No [package] section found in {cargo_toml}")
+        match = re.search(r'^version\s*=\s*"([^"]+)"', package_section.group(1), re.MULTILINE)
+        if not match:
+            raise SystemExit(f"No version field found in {cargo_toml}'s [package] section")
+        return match.group(1)
+
+    raise SystemExit(f"No pubspec.yaml or Cargo.toml found in {REPO_ROOT} - run this from an app repo's root")
 
 
 def find_bundle_dir() -> Path:
