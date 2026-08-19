@@ -16,7 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import packagers  # noqa: E402
-from common import STAGE_DIR, find_bundle_dir, read_upstream_version, stage_bundle  # noqa: E402
+from common import REPO_ROOT, STAGE_DIR, find_bundle_dir, read_upstream_version, stage_bundle  # noqa: E402
 
 log = logging.getLogger("package")
 
@@ -44,7 +44,10 @@ def main() -> None:
     arch = platform.machine()
     log.info("Version: %s  Release: %s  Arch: %s", version, args.release, arch)
 
-    staged_bundle = stage_bundle(find_bundle_dir())
+    # Flutter apps ship a variable-named build/elinux/*/release/bundle dir, so
+    # it's staged to a fixed path nfpm.yaml can reference. Cargo apps build to
+    # a fixed target/release path already, so nfpm.yaml references that directly.
+    staged_bundle = stage_bundle(find_bundle_dir()) if (REPO_ROOT / "pubspec.yaml").exists() else None
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
